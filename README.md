@@ -1,3 +1,3 @@
 # Script for mutex contention test
 
-- for graduation thesis (Wonsuck Yang)
+- for graduation thesis (Wonsuk Yang)
