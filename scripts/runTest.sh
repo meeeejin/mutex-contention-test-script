@@ -1,11 +1,14 @@
 #!/bin/bash
 
-result_dir="/home/yangws/test_result"
 data_dir="/home/yangws/test_data"
 log_dir="/home/yangws/test_log"
 backup_dir="/home/yangws/data_backup"
+result_dir="/home/yangws/test_result"
+
 mysql_dir="/home/yangws/mysql-5.7.21"
 tpcc_dir="/home/yangws/tpcc-mysql"
+
+current_dir=$(pwd)
 
 buf_instance=( "1" "4" "8" "16" "32" )
 passwd="1234"
@@ -37,6 +40,9 @@ do
     cd ${tpcc_dir}
     iostat -mx 1 > ${result_dir}/iostat_buf_${i}.out &
     ./runBench.sh | tee ${result_dir}/tpcc_buf_${i}.out
+
+    cd ${current_dir}
+    ./monitoring.sh ${i}
 
     killall -9 iostat
 
