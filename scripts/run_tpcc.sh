@@ -11,14 +11,17 @@ tpcc_dir="/home/yangws/tpcc-mysql"
 current_dir=$(pwd)
 
 buf_instance=( "1" "4" "8" "16" "32" )
-passwd="1234"
 
 echo "Start TPCC to test mutex contention"
 
 for i in "${buf_instance[@]}"
 do
     # If the result file already exists, remove it
-    rm ${result_dir}/mutex_buf_${i}.out
+    result_file=${result_dir}/mutex_buf_${i}.out
+    if [ -f "$result_file" ]
+    then
+        rm $result_file
+    fi
 
     # Remove existing data
     rm -rf ${data_dir}/*
@@ -37,12 +40,14 @@ do
 
     # Run TPC-C benchmark
     echo "START TPCC BENCHMARK"
-    cd ${tpcc_dir}
+    
     iostat -mx 1 > ${result_dir}/iostat_buf_${i}.out &
-    ./runBench.sh | tee ${result_dir}/tpcc_buf_${i}.out
-
+   
     cd ${current_dir}
-    ./monitoring.sh ${i}
+    ./monitoring.sh ${i} &
+
+    cd ${tpcc_dir}
+    ./runBench.sh | tee ${result_dir}/tpcc_buf_${i}.out
 
     killall -9 iostat
 
@@ -50,8 +55,6 @@ do
     ps cax | grep mysql > /dev/null
     if [ $? -eq 0 ]; then
         cd ${mysql_dir}
-        ./bin/mysqladmin -uroot -p${passwd} shutdown
+        ./bin/mysqladmin -uroot shutdown
     fi
 done
-
-
