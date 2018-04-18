@@ -10,7 +10,7 @@
 - [MySQL server](https://github.com/meeeejin/til/blob/master/mysql/build-and-install-the-source-code-5.7.md)
 - [TPC-C](https://github.com/Percona-Lab/tpcc-mysql)
 - [LinkBench](https://github.com/facebookarchive/linkbench)
-- `sysstat` (`sudo apt-get install sysstat`)
+- sysstat (`sudo apt-get install sysstat`)
 
 ## How to run the scripts
 
