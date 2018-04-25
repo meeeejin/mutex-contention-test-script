@@ -28,6 +28,13 @@ vi run_tpcc.sh # TPC-C script 파일 수정
 vi run_lb.sh # linkBench script 파일 수정
 ```
 
+3. InnoDB mutex 및 sxlock 인스턴스가 활성화되도록, 아래의 performance-schema-instrument rule을 MySQL의 configure 파일(`my.cnf`)에 추가한다.
+
+```bash
+performance-schema-instrument='wait/synch/mutex/innodb/%=ON'
+performance-schema-instrument='wait/synch/sxlock/innodb/%=ON'
+```
+
 3. Script를 실행한다. 각 benchmark가 실행되는 동안, mutex 관련 정보가 `result_dir` 폴더에 기록된다.
 
 ```bash
@@ -38,37 +45,49 @@ vi run_lb.sh # linkBench script 파일 수정
 ./run_lb.sh # LinkBench 돌리면서 mutex 정보 수집
 ```
 
-Mutex 관련 정보는 아래와 같은 방식으로 기록된다
+Mutex 및 swlock 관련 정보는 아래와 같은 방식으로 기록된다
 
 ```bash
 EVENT_NAME      COUNT_STAR      SUM_TIMER_WAIT_MS       AVG_TIMER_WAIT_MS
-wait/synch/mutex/innodb/buf_pool_mutex  92889   9.8649  0.0001
-wait/synch/mutex/innodb/rw_lock_list_mutex      327755  5.9407  0.0000
-wait/synch/mutex/innodb/fil_system_mutex        122355  5.8620  0.0000
-wait/synch/mutex/innodb/log_sys_mutex   30882   1.5461  0.0000
-wait/synch/mutex/innodb/trx_mutex       596     0.0109  0.0000
-wait/synch/mutex/innodb/recv_sys_mutex  199     0.0098  0.0000
-wait/synch/mutex/innodb/dict_sys_mutex  44      0.0097  0.0002
-wait/synch/mutex/innodb/flush_list_mutex        116     0.0058  0.0000
-wait/synch/mutex/innodb/sync_array_mutex        46      0.0051  0.0001
-wait/synch/mutex/innodb/redo_rseg_mutex 97      0.0036  0.0000
-wait/synch/mutex/innodb/trx_sys_mutex   113     0.0027  0.0000
-wait/synch/mutex/innodb/lock_mutex      98      0.0020  0.0000
-wait/synch/mutex/innodb/log_sys_write_mutex     40      0.0019  0.0000
-wait/synch/mutex/innodb/log_flush_order_mutex   38      0.0015  0.0000
-wait/synch/mutex/innodb/thread_mutex    24      0.0014  0.0001
-wait/synch/mutex/innodb/lock_wait_mutex 4       0.0009  0.0002
-wait/synch/mutex/innodb/trx_pool_manager_mutex  12      0.0008  0.0001
-wait/synch/mutex/innodb/innobase_share_mutex    16      0.0007  0.0000
+wait/synch/sxlock/innodb/checkpoint_lock        4       13.1749 3.2937
+wait/synch/mutex/innodb/buf_pool_mutex  92891   10.4717 0.0001
+wait/synch/mutex/innodb/rw_lock_list_mutex      327766  5.7679  0.0000
+wait/synch/mutex/innodb/fil_system_mutex        122369  5.6782  0.0000
+wait/synch/mutex/innodb/dict_sys_mutex  62      5.3440  0.0862
+wait/synch/sxlock/innodb/hash_table_locks       62703   4.6289  0.0001
+wait/synch/mutex/innodb/log_sys_mutex   30884   1.4442  0.0000
+wait/synch/mutex/innodb/trx_mutex       1305    0.0258  0.0000
+wait/synch/sxlock/innodb/index_tree_rw_lock     309     0.0226  0.0001
+wait/synch/mutex/innodb/sync_array_mutex        179     0.0143  0.0001
+wait/synch/mutex/innodb/recv_sys_mutex  199     0.0112  0.0001
+wait/synch/mutex/innodb/thread_mutex    24      0.0109  0.0005
+wait/synch/sxlock/innodb/fil_space_latch        127     0.0068  0.0001
+wait/synch/mutex/innodb/flush_list_mutex        116     0.0062  0.0001
+wait/synch/mutex/innodb/redo_rseg_mutex 116     0.0055  0.0000
+wait/synch/mutex/innodb/innobase_share_mutex    48      0.0045  0.0001
+wait/synch/mutex/innodb/trx_sys_mutex   141     0.0039  0.0000
+wait/synch/sxlock/innodb/dict_table_stats       16      0.0024  0.0001
+wait/synch/mutex/innodb/log_sys_write_mutex     40      0.0021  0.0001
+wait/synch/mutex/innodb/lock_mutex      98      0.0019  0.0000
+wait/synch/mutex/innodb/trx_pool_manager_mutex  35      0.0017  0.0000
+wait/synch/mutex/innodb/trx_pool_mutex  43      0.0016  0.0000
+wait/synch/sxlock/innodb/dict_operation_lock    6       0.0016  0.0003
+wait/synch/mutex/innodb/log_flush_order_mutex   38      0.0012  0.0000
+wait/synch/sxlock/innodb/btr_search_latch       19      0.0011  0.0001
+wait/synch/mutex/innodb/lock_wait_mutex 4       0.0010  0.0003
+wait/synch/sxlock/innodb/trx_purge_latch        4       0.0010  0.0002
+wait/synch/mutex/innodb/buf_dblwr_mutex 9       0.0009  0.0001
 wait/synch/mutex/innodb/row_drop_list_mutex     3       0.0007  0.0002
-wait/synch/mutex/innodb/trx_pool_mutex  20      0.0007  0.0000
-wait/synch/mutex/innodb/srv_sys_mutex   12      0.0006  0.0000
-wait/synch/mutex/innodb/buf_dblwr_mutex 9       0.0006  0.0001
-wait/synch/mutex/innodb/page_cleaner_mutex      4       0.0002  0.0001
+wait/synch/mutex/innodb/srv_sys_mutex   12      0.0004  0.0000
+wait/synch/mutex/innodb/page_cleaner_mutex      4       0.0003  0.0001
+wait/synch/mutex/innodb/ibuf_mutex      3       0.0002  0.0001
 wait/synch/mutex/innodb/file_format_max_mutex   10      0.0002  0.0000
-wait/synch/mutex/innodb/ibuf_mutex      3       0.0001  0.0000
-wait/synch/mutex/innodb/srv_innodb_monitor_mutex        1       0.0000  0.0000
-wait/synch/mutex/innodb/recv_writer_mutex       1       0.0000  0.0000
+wait/synch/mutex/innodb/srv_innodb_monitor_mutex        1       0.0001  0.0001
+wait/synch/mutex/innodb/recv_writer_mutex       1       0.0001  0.0001
+wait/synch/sxlock/innodb/fts_cache_rw_lock      0       0.0000  0.0000
+wait/synch/sxlock/innodb/fts_cache_init_rw_lock 0       0.0000  0.0000
+wait/synch/sxlock/innodb/trx_i_s_cache_lock     0       0.0000  0.0000
+wait/synch/sxlock/innodb/index_online_log       0       0.0000  0.0000
 wait/synch/mutex/innodb/autoinc_mutex   1       0.0000  0.0000
 ...
 ```

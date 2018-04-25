@@ -15,9 +15,9 @@ do
             FROM performance_schema.events_waits_summary_global_by_event_name \
             WHERE SUM_TIMER_WAIT > 0 AND \
             EVENT_NAME LIKE 'wait/synch/mutex/innodb/%' \
-            or EVENT_NAME LIKE 'wait/synch/rwlock/innodb/%' \
+            or EVENT_NAME LIKE 'wait/synch/sxlock/innodb/%' \
             ORDER BY SUM_TIMER_WAIT_MS DESC;" >> ${result_dir}/mutex_buf_$1.out
     echo -e "" >> ${result_dir}/mutex_buf_$1.out
-    
+
     sleep 1
 done
