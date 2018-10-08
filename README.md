@@ -45,7 +45,7 @@ performance-schema-instrument='wait/synch/sxlock/innodb/%=ON'
 ./run_lb.sh # LinkBench 돌리면서 mutex 정보 수집
 ```
 
-Mutex 및 swlock 관련 정보는 아래와 같은 방식으로 기록된다
+Mutex 및 sxlock 관련 정보는 아래와 같은 방식으로 기록된다
 
 ```bash
 EVENT_NAME      COUNT_STAR      SUM_TIMER_WAIT_MS       AVG_TIMER_WAIT_MS
@@ -94,4 +94,4 @@ wait/synch/mutex/innodb/autoinc_mutex   1       0.0000  0.0000
 
 4. 수집된 mutex 정보를 이용해, buffer pool 개수와 workload에 따른 mutex contention 경향을 분석한다.
 
-> 수정 중..
+> parsing.sh 등으로 parsing 후 분석
